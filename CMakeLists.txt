@@ -27,6 +27,17 @@ function(add_configure_command STAGE INFILE OUTFILE)
 		COMMENT "Configuring ${relsrc} into ${STAGE} staging directory...")
 endfunction()
 
+# Utility for adding a copy output
+function(add_copy_command STAGE INFILE OUTFILE)
+	get_filename_component(outdir "${OUTFILE}" PATH)
+	file(RELATIVE_PATH relsrc "${CMAKE_CURRENT_SOURCE_DIR}/app" "${INFILE}")
+	get_filename_component(outdir "${OUTFILE}" PATH)
+	add_custom_command(OUTPUT "${OUTFILE}"
+		COMMAND ${MKDIR} "${outdir}"
+		COMMAND ${COPY_IF_DIFFERENT} "${INFILE}" "${OUTFILE}"
+		MAIN_DEPENDENCY "${INFILE}"
+		COMMENT "Copying ${relsrc} to ${STAGE} staging directory...")
+endfunction()
 
 # Function that copies/configures all standard files to the indicated stage directory.
 function(stage_files STAGE VARNAME)
@@ -38,11 +49,7 @@ function(stage_files STAGE VARNAME)
 		set(infn "${CMAKE_CURRENT_SOURCE_DIR}/app/${fn}")
 
 		list(APPEND OUTFILES "${outfn}")
-		add_custom_command(OUTPUT "${outfn}"
-			COMMAND ${MKDIR} "${outdir}"
-			COMMAND ${COPY_IF_DIFFERENT} "${infn}" "${outfn}"
-			MAIN_DEPENDENCY "${infn}"
-			COMMENT "Copying ${fn} to ${STAGE} staging directory...")
+		add_copy_command(${STAGE} "${infn}" "${outfn}")
 	endforeach()
 
 	foreach(fn ${CONFIGURE_FILES})
@@ -53,7 +60,10 @@ function(stage_files STAGE VARNAME)
 		list(APPEND OUTFILES "${outfn}")
 		add_configure_command(${STAGE} "${infn}" "${outfn}")
 	endforeach()
-	
+	add_configure_command(${STAGE} "${CMAKE_CURRENT_SOURCE_DIR}/app/install.rdf.tpl.xml" "${STAGEDIR}/install.rdf")
+	add_configure_command(${STAGE} "${CMAKE_CURRENT_SOURCE_DIR}/app/update.rdf.tpl.xml" "${STAGEDIR}/update.rdf")
+	list(APPEND OUTFILES "${STAGEDIR}/install.rdf" "${STAGEDIR}/update.rdf")
+
 	set(${VARNAME} ${OUTFILES} PARENT_SCOPE)
 endfunction()
 
@@ -61,9 +71,6 @@ endfunction()
 # Target: xpi
 ###
 stage_files(XPI XPIOUTFILES)
-add_configure_command(XPI "${CMAKE_CURRENT_SOURCE_DIR}/app/install.rdf.tpl.xml" "${CMAKE_CURRENT_BINARY_DIR}/XPI/install.rdf")
-add_configure_command(XPI "${CMAKE_CURRENT_SOURCE_DIR}/app/update.rdf.tpl.xml" "${CMAKE_CURRENT_BINARY_DIR}/XPI/update.rdf")
-list(APPEND XPIOUTFILES "${CMAKE_CURRENT_BINARY_DIR}/XPI/install.rdf" "${CMAKE_CURRENT_BINARY_DIR}/XPI/update.rdf")
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
 	COMMAND zip -r "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}" *
