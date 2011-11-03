@@ -1,0 +1,8 @@
+set(VERSION 2)
+set(BUILD 2)
+set(AUTHOR "Duong Thanh An (an.duong@evolus.vn) and Contributors")
+set(XPI_NAME "Pencil-${VERSION}-${BUILD}-fx.xpi")
+set(MIN_VERSION "1.9.8")
+set(MAX_VERSION "10.*")
+set(UPDATE_URL "http://pencil.evolus.vn")
+set(XULRUNNER_XUL "*")
