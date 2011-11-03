@@ -20,7 +20,7 @@ function(add_configure_command STAGE INFILE OUTFILE)
 	get_filename_component(outdir "${OUTFILE}" PATH)
 	add_custom_command(OUTPUT "${OUTFILE}"
 		COMMAND ${MKDIR} "${outdir}"
-		COMMAND "${CMAKE_COMMAND}" -DINFILE:FILEPATH="${INFILE}" -DOUTFILE:FILEPATH="${OUTFILE}" -P "${CMAKE_CURRENT_SOURCE_DIR}/configurefile.cmake"
+		COMMAND "${CMAKE_COMMAND}" -DXULRUNNER_EXECUTABLE="${XULRUNNER_EXECUTABLE}" -DINFILE:FILEPATH="${INFILE}" -DOUTFILE:FILEPATH="${OUTFILE}" -P "${CMAKE_CURRENT_SOURCE_DIR}/configurefile.cmake"
 		MAIN_DEPENDENCY "${INFILE}"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/version.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/configurefile.cmake"
@@ -85,4 +85,24 @@ add_custom_target(xpi ALL
 add_custom_target(ffinstall
 	COMMAND firefox "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
 	DEPENDS xpi)
+
+###
+# Target: linux
+###
+find_program(XULRUNNER_EXECUTABLE xulrunner)
+stage_files(linux-xulrunner LINUXOUTFILES)
+add_configure_command(linux-xulrunner "${CMAKE_CURRENT_SOURCE_DIR}/app/application.ini.tpl" "${CMAKE_CURRENT_BINARY_DIR}/linux-xulrunner/application.ini")
+add_configure_command(linux-xulrunner "${CMAKE_CURRENT_SOURCE_DIR}/build/Pencil-BuildTree.desktop.in" "${CMAKE_CURRENT_BINARY_DIR}/Pencil-BuildTree.desktop")
+list(APPEND LINUXOUTFILES "${CMAKE_CURRENT_BINARY_DIR}/linux-xulrunner/application.ini" "${CMAKE_CURRENT_BINARY_DIR}/Pencil-BuildTree.desktop")
+
+
+add_custom_target(linux
+	DEPENDS ${LINUXOUTFILES})
+
+
+#set(EXTENSIONS_DIR "${EXTENSIONS_DIR}" PATH CACHE "")
+#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
+#	DESTINATION ${EXTENSIONS_DIR}
+#	RENAME pencil@evolus.vn.xpi)
+
 
