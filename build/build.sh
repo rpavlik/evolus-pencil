@@ -143,7 +143,7 @@ mac() {
     echo "---------------------------------------------"
 
     rm -Rf ./Outputs/Mac/
-    mkdir ./Outputs/Mac/
+    mkdir -p ./Outputs/Mac/Pencil.app/Contents/Resources/defaults/preferences/
 
     cp -R ./Mac/* ./Outputs/Mac/
     cp -R ./Outputs/Pencil/* ./Outputs/Mac/Pencil.app/Contents/Resources/
