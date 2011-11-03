@@ -81,3 +81,8 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
 add_custom_target(xpi ALL
 	DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
 	COMMENT "Built XPI file: ${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}")
+
+add_custom_target(ffinstall
+	COMMAND firefox "${CMAKE_CURRENT_BINARY_DIR}/${XPI_NAME}"
+	DEPENDS xpi)
+
